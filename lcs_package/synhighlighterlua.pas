@@ -922,7 +922,7 @@ begin
     fTokenID := tkComment;
   end
   else
-    fTokenID := tkIdentifier;
+    fTokenID := tkSymbol;
 end;
 
 procedure TSynLuaSyn.LuaMStringProc;

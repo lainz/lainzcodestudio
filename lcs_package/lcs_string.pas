@@ -5,7 +5,7 @@ unit lcs_string;
 interface
 
 uses
-  Classes, SysUtils, StrUtils, LazUTF8, Lua53;
+  Classes, SysUtils, LazUTF8, Lua53;
 
 procedure RegisterString(L: Plua_State);
 
@@ -17,11 +17,10 @@ function StringCompareFileVersions(L: Plua_state): integer; cdecl;
 function StringCompareNoCase(L: Plua_State): integer; cdecl;
 function StringConcat(L: Plua_State): integer; cdecl;
 function StringFind(L: Plua_State): integer; cdecl;
-//function StringGetFormattedSize(L: Plua_State): integer; cdecl;
+function StringGetFormattedSize(L: Plua_State): integer; cdecl;
 function StringLeft(L: Plua_State): integer; cdecl;
 function StringLength(L: Plua_State): integer; cdecl;
 function StringLower(L: Plua_State): integer; cdecl;
-//function StringMakePath(L: Plua_State): integer; cdecl;
 function StringMid(L: Plua_State): integer; cdecl;
 function StringRepeat(L: Plua_State): integer; cdecl;
 function StringReplaceLua(L: Plua_State): integer; cdecl;
@@ -55,6 +54,7 @@ begin
   RegisterFunction('CompareNoCase', @StringCompareNoCase);
   RegisterFunction('Concat', @StringConcat);
   RegisterFunction('Find', @StringFind);
+  RegisterFunction('GetFormattedSize', @StringGetFormattedSize);
   RegisterFunction('Left', @StringLeft);
   RegisterFunction('Length', @StringLength);
   RegisterFunction('Lower', @StringLower);
@@ -183,6 +183,47 @@ begin
   else
     res := UTF8Pos(UTF8LowerCase(s2), UTF8LowerCase(s1), index);
   lua_pushinteger(L, res);
+  Result := 1;
+end;
+
+function StringGetFormattedSize(L: Plua_State): integer; cdecl;
+var
+  sres: string;
+  res: lua_number;
+  bytes: int64;
+  format: integer;
+begin
+  bytes := lua_tointeger(L, -2);
+  format := lua_tointeger(L, -1);
+
+  if format = 1 then
+    case bytes of
+      0..999: format := 2; // Byte
+      1000..999999: format := 3; // Kilobyte
+      1000000..999999999: format := 4; // Megabyte
+      1000000000..999999999999: format := 5; // Gigabyte
+      1000000000000..999999999999999: format := 6; // Terabyte
+    end;
+
+  case format of
+    2: res := bytes; // Byte
+    3: res := bytes / 1000; // Kilobyte
+    4: res := bytes / 1000000; // Megabyte
+    5: res := bytes / 1000000000; // Gigabyte
+    6: res := bytes / 1000000000000; // Terabyte
+  end;
+
+  sres := FloatToStr(res, DefaultFormatSettings);
+
+  case format of
+    2: sres += ' Byte';
+    3: sres += ' KB';
+    4: sres += ' MB';
+    5: sres += ' GB';
+    6: sres += ' TB';
+  end;
+
+  lua_pushstring(L, sres);
   Result := 1;
 end;
 

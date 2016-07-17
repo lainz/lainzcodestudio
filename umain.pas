@@ -5,7 +5,7 @@ unit umain;
 interface
 
 uses
-  Forms, Graphics, StdCtrls, Lua53, SynHighlighterLua, SynEdit;
+  Forms, StdCtrls, Lua53, SynHighlighterLua, SynEdit;
 
 type
 
@@ -30,7 +30,7 @@ var
 implementation
 
 uses
-  lcs_string;
+  lcs_string, lcs_inifile;
 
 {$R *.lfm}
 
@@ -71,6 +71,7 @@ begin
     luaL_openlibs(L);
     lua_register(L, 'print', @print);
     RegisterString(L);
+    RegisterINIFile(L);
     s := SynEdit1.Text;
     err := (luaL_loadbuffer(L, PChar(s), Length(s), 'Lainz Code Studio') <> 0) or
       (lua_pcall(L, 0, 0, 0) <> 0);
