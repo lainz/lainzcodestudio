@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
-  Left = 268
+  Left = 95
   Height = 600
-  Top = 170
+  Top = 157
   Width = 800
   Caption = 'Lainz Code Studio'
   ClientHeight = 600
@@ -451,16 +451,7 @@ object frmMain: TfrmMain
     MouseTextActions = <>
     MouseSelActions = <>
     Lines.Strings = (
-      '--print(String.Length(''Cañón''))'
-      'print(String.Lower(''CAÑÓN''))'
-      '--[[print(String.Repeat(''Cañón'', 4))'
-      'print(String.Upper(''cañón'')) ]]'
-      'print(String.Asc(''h''))'
-      'print(String.Char(104))'
-      'print(String.Compare(''cañón'',''día''))'
-      'print(String.CompareFileVersions(''1.0.0.0'',''2.0.0.0''))'
-      'print(String.CompareNoCase(''CAÑÓN'', ''cañón''))'
-      'print(String.Concat(''10'',''20''))'
+      ''
     )
     VisibleSpecialChars = [vscSpace, vscTabAtLast]
     SelectedColor.BackPriority = 50

@@ -5,10 +5,11 @@ unit lcs_string;
 interface
 
 uses
-  Classes, SysUtils, LazUTF8, Lua53;
+  Classes, SysUtils, StrUtils, LazUTF8, Lua53;
 
 procedure RegisterString(L: Plua_State);
 
+//function AbbreviateFilePath(L: Plua_State): integer; cdecl;
 function StringAsc(L: Plua_State): integer; cdecl;
 function StringChar(L: Plua_State): integer; cdecl;
 function StringCompare(L: Plua_State): integer; cdecl;
@@ -17,10 +18,20 @@ function StringCompareNoCase(L: Plua_State): integer; cdecl;
 function StringConcat(L: Plua_State): integer; cdecl;
 function StringFind(L: Plua_State): integer; cdecl;
 //function StringGetFormattedSize(L: Plua_State): integer; cdecl;
+function StringLeft(L: Plua_State): integer; cdecl;
 function StringLength(L: Plua_State): integer; cdecl;
 function StringLower(L: Plua_State): integer; cdecl;
-function StringRepeat(L: PLua_State): integer; cdecl;
-function StringUpper(L: PLua_State): integer; cdecl;
+//function StringMakePath(L: Plua_State): integer; cdecl;
+function StringMid(L: Plua_State): integer; cdecl;
+function StringRepeat(L: Plua_State): integer; cdecl;
+function StringReplaceLua(L: Plua_State): integer; cdecl;
+function StringReverseFind(L: Plua_State): integer; cdecl;
+function StringRight(L: Plua_State): integer; cdecl;
+//function StringSplitPath(L: Plua_State): integer; cdecl;
+function StringToNumber(L: Plua_State): integer; cdecl;
+//function StringTrimLeft(L: Plua_State): integer; cdecl;
+//function StringTrimRight(L: Plua_State): integer; cdecl;
+function StringUpper(L: Plua_State): integer; cdecl;
 
 implementation
 
@@ -44,9 +55,15 @@ begin
   RegisterFunction('CompareNoCase', @StringCompareNoCase);
   RegisterFunction('Concat', @StringConcat);
   RegisterFunction('Find', @StringFind);
+  RegisterFunction('Left', @StringLeft);
   RegisterFunction('Length', @StringLength);
   RegisterFunction('Lower', @StringLower);
+  RegisterFunction('Mid', @StringMid);
   RegisterFunction('Repeat', @StringRepeat);
+  RegisterFunction('Replace', @StringReplaceLua);
+  RegisterFunction('ReverseFind', @StringReverseFind);
+  RegisterFunction('Right', @StringRight);
+  RegisterFunction('ToNumber', @StringToNumber);
   RegisterFunction('Upper', @StringUpper);
   lua_setglobal(L, 'String');
 end;
@@ -169,6 +186,12 @@ begin
   Result := 1;
 end;
 
+function StringLeft(L: Plua_State): integer; cdecl;
+begin
+  lua_pushstring(L, UTF8LeftStr(lua_tostring(L, -2), lua_tointeger(L, -1)));
+  Result := 1;
+end;
+
 function StringLength(L: Plua_State): integer; cdecl;
 begin
   lua_pushinteger(L, UTF8Length(lua_tostring(L, -1)));
@@ -178,6 +201,13 @@ end;
 function StringLower(L: Plua_State): integer; cdecl;
 begin
   lua_pushstring(L, UTF8LowerCase(lua_tostring(L, -1)));
+  Result := 1;
+end;
+
+function StringMid(L: Plua_State): integer; cdecl;
+begin
+  lua_pushstring(L, UTF8Copy(lua_tostring(L, -3), lua_tointeger(L, -2),
+    lua_tointeger(L, -1)));
   Result := 1;
 end;
 
@@ -199,11 +229,60 @@ begin
   Result := 1;
 end;
 
-function StringUpper(L: PLua_State): integer; cdecl;
+function StringReplaceLua(L: Plua_State): integer; cdecl;
+begin
+  if lua_toboolean(L, -1) then
+    lua_pushstring(L, StringReplace(lua_tostring(L, -4), lua_tostring(L, -3),
+      lua_tostring(L, -2), [rfReplaceAll]))
+  else
+    lua_pushstring(L, StringReplace(lua_tostring(L, -4), lua_tostring(L, -3),
+      lua_tostring(L, -2), [rfReplaceAll, rfIgnoreCase]));
+  Result := 1;
+end;
+
+function StringReverseFind(L: Plua_State): integer; cdecl;
+
+  function UTF8ReverseString(const AText: string): string;
+  var
+    i: integer;
+  begin
+    Result := '';
+    for i := UTF8Length(AText) - 1 downto 0 do
+      Result := Result + UTF8Copy(AText, i + 1, 1);
+  end;
+
+var
+  s1, s2: string;
+  res: integer;
+begin
+  s1 := UTF8ReverseString(lua_tostring(L, -3));
+  s2 := UTF8ReverseString(lua_tostring(L, -2));
+  if lua_toboolean(L, -1) then
+    res := UTF8Pos(s2, s1)
+  else
+    res := UTF8Pos(UTF8LowerCase(s2), UTF8LowerCase(s1));
+  if res <> 0 then
+    res := UTF8Length(s1) - UTF8Length(s2) - res + 2;
+  lua_pushinteger(L, res);
+  Result := 1;
+end;
+
+function StringRight(L: Plua_State): integer; cdecl;
+begin
+  lua_pushstring(L, UTF8RightStr(lua_tostring(L, -2), lua_tointeger(L, -1)));
+  Result := 1;
+end;
+
+function StringToNumber(L: Plua_State): integer; cdecl;
+begin
+  lua_pushnumber(L, lua_tonumber(L, -1));
+  Result := 1;
+end;
+
+function StringUpper(L: Plua_State): integer; cdecl;
 begin
   lua_pushstring(L, UTF8UpperCase(lua_tostring(L, -1)));
   Result := 1;
 end;
 
 end.
-
