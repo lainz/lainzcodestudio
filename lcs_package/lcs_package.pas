@@ -7,7 +7,8 @@ unit lcs_package;
 interface
 
 uses
-  lcs_inifile, lcs_string, lua53, SynHighlighterLua, LazarusPackageIntf;
+  lcs_inifile, lcs_registerall, lcs_registry, lcs_string, lua53, 
+  SynHighlighterLua, LazarusPackageIntf;
 
 implementation
 

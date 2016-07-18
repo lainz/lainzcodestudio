@@ -30,7 +30,7 @@ var
 implementation
 
 uses
-  lcs_string, lcs_inifile;
+  lcs_registerall;
 
 {$R *.lfm}
 
@@ -70,8 +70,7 @@ begin
   try
     luaL_openlibs(L);
     lua_register(L, 'print', @print);
-    RegisterString(L);
-    RegisterINIFile(L);
+    RegisterAll(L);
     s := SynEdit1.Text;
     err := (luaL_loadbuffer(L, PChar(s), Length(s), 'Lainz Code Studio') <> 0) or
       (lua_pcall(L, 0, 0, 0) <> 0);

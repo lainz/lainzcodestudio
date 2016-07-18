@@ -21,6 +21,7 @@ function StringGetFormattedSize(L: Plua_State): integer; cdecl;
 function StringLeft(L: Plua_State): integer; cdecl;
 function StringLength(L: Plua_State): integer; cdecl;
 function StringLower(L: Plua_State): integer; cdecl;
+//function StringMakePath(L: Plua_State): integer; cdecl;
 function StringMid(L: Plua_State): integer; cdecl;
 function StringRepeat(L: Plua_State): integer; cdecl;
 function StringReplaceLua(L: Plua_State): integer; cdecl;
@@ -252,7 +253,7 @@ begin
   Result := 1;
 end;
 
-function StringRepeat(L: PLua_State): integer; cdecl;
+function StringRepeat(L: Plua_State): integer; cdecl;
 var
   i, j: int64;
   s, ls: string;
