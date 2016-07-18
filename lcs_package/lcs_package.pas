@@ -8,7 +8,7 @@ interface
 
 uses
   lcs_crypto, lcs_inifile, lcs_registerall, lcs_registry, lcs_string, 
-  lcs_table, lcs_textfile, lcs_zip, lua53, SynHighlighterLua, 
+  lcs_table, lcs_textfile, lcs_zip, lua53, SynHighlighterLua, lcs_folder, 
   LazarusPackageIntf;
 
 implementation
