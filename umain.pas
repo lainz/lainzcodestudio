@@ -48,7 +48,7 @@ end;
 
 function print(L: Plua_State): integer; cdecl;
 begin
-  frmMain.ListBox1.Items.Add(lua_tostring(L, -1));
+  frmMain.ListBox1.Items.AddText(lua_tostring(L, -1));
   Result := 0;
 end;
 

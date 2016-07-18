@@ -12,7 +12,8 @@ procedure RegisterAll(L: Plua_State; S: TStrings);
 implementation
 
 uses
-  lcs_string, lcs_inifile, lcs_registry, lcs_textfile, lcs_zip, lcs_table;
+  lcs_string, lcs_inifile, lcs_registry, lcs_textfile, lcs_zip, lcs_table,
+  lcs_crypto;
 
 procedure RegisterAll(L: Plua_State; S: TStrings);
 begin
@@ -22,6 +23,7 @@ begin
   RegisterTextFile(L);
   RegisterZip(L);
   RegisterTable(L, S);
+  RegisterCrypto(L);
 end;
 
 end.
