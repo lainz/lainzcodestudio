@@ -89,7 +89,7 @@ var
 begin
   reg := TRegistry.Create;
   reg.RootKey := GetRootKey(lua_tointeger(L, -3));
-  reg.OpenKey(lua_tostring(L, -2), true);
+  reg.OpenKey(lua_tostring(L, -2), True);
   reg.DeleteValue(lua_tostring(L, -1));
   reg.Free;
   Result := 0;
