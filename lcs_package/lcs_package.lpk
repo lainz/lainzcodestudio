@@ -11,7 +11,7 @@
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="8">
+    <Files Count="10">
       <Item1>
         <Filename Value="lcs_inifile.pas"/>
         <UnitName Value="lcs_inifile"/>
@@ -29,22 +29,30 @@
         <UnitName Value="lcs_string"/>
       </Item4>
       <Item5>
-        <Filename Value="lcs_textfile.pas"/>
-        <UnitName Value="lcs_textfile"/>
+        <Filename Value="lcs_table.pas"/>
+        <UnitName Value="lcs_table"/>
       </Item5>
       <Item6>
-        <Filename Value="lua53.pas"/>
-        <UnitName Value="lua53"/>
+        <Filename Value="lcs_textfile.pas"/>
+        <UnitName Value="lcs_textfile"/>
       </Item6>
       <Item7>
-        <Filename Value="synedit.inc"/>
-        <Type Value="Include"/>
+        <Filename Value="lcs_zip.pas"/>
+        <UnitName Value="lcs_zip"/>
       </Item7>
       <Item8>
+        <Filename Value="lua53.pas"/>
+        <UnitName Value="lua53"/>
+      </Item8>
+      <Item9>
+        <Filename Value="synedit.inc"/>
+        <Type Value="Include"/>
+      </Item9>
+      <Item10>
         <Filename Value="synhighlighterlua.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="SynHighlighterLua"/>
-      </Item8>
+      </Item10>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>

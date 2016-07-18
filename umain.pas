@@ -5,7 +5,7 @@ unit umain;
 interface
 
 uses
-  Forms, StdCtrls, Lua53, SynHighlighterLua, SynEdit;
+  Classes, Forms, StdCtrls, Lua53, SynHighlighterLua, SynEdit;
 
 type
 
@@ -62,7 +62,7 @@ end;
 procedure TfrmMain.btnBuildAndRunClick(Sender: TObject);
 var
   L: Plua_State;
-  s: string;
+  S: TStringList;
   err: boolean;
 begin
   ListBox1.Clear;
@@ -70,15 +70,17 @@ begin
   try
     luaL_openlibs(L);
     lua_register(L, 'print', @print);
-    RegisterAll(L);
-    s := SynEdit1.Text;
-    err := (luaL_loadbuffer(L, PChar(s), Length(s), 'Lainz Code Studio') <> 0) or
-      (lua_pcall(L, 0, 0, 0) <> 0);
+    S := TStringList.Create;
+    RegisterAll(L, S);
+    S.Add(SynEdit1.Text);
+    err := (luaL_loadbuffer(L, PChar(S.Text), Length(S.Text), 'Lainz Code Studio') <>
+      0) or (lua_pcall(L, 0, 0, 0) <> 0);
     if err then
     begin
       ListBox1.Items.Add(lua_tostring(L, -1));
     end;
   finally
+    S.Free;
     lua_close(L);
   end;
 end;
