@@ -13,7 +13,7 @@ implementation
 
 uses
   lcs_string, lcs_inifile, lcs_registry, lcs_textfile, lcs_zip, lcs_table,
-  lcs_crypto, lcs_folder, lcs_file;
+  lcs_crypto, lcs_folder, lcs_file, lcs_application;
 
 procedure RegisterAll(L: Plua_State; S: TStrings);
 begin
@@ -26,6 +26,7 @@ begin
   RegisterCrypto(L);
   RegisterFolder(L);
   RegisterFile(L);
+  RegisterApplication(L);
 end;
 
 end.

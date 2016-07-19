@@ -70,8 +70,10 @@ begin
 end;
 
 function FilePrint(L: Plua_State): integer; cdecl;
+{$IFDEF WINDOWS}
 var
   s: WideString;
+{$ENDIF}
 begin
   {$IFDEF WINDOWS}
   s := lua_tostring(L, -1);
