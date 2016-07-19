@@ -7,6 +7,7 @@ object frmMain: TfrmMain
   ClientHeight = 600
   ClientWidth = 800
   OnCreate = FormCreate
+  Position = poScreenCenter
   LCLVersion = '1.6.0.4'
   inline SynEdit1: TSynEdit
     Left = 8
@@ -528,9 +529,36 @@ object frmMain: TfrmMain
   end
   object SynLuaSyn1: TSynLuaSyn
     Enabled = False
+    CommentAttri.Foreground = clGreen
     Comments = []
     DetectPreprocessor = False
     IdentifierChars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz'
+    KeyWords.Strings = (
+      'AND'
+      'BREAK'
+      'DO'
+      'ELSE'
+      'ELSEIF'
+      'END'
+      'FALSE'
+      'FOR'
+      'FUNCTION'
+      'GOTO'
+      'IF'
+      'IN'
+      'LOCAL'
+      'NIL'
+      'NOT'
+      'OR'
+      'REPEAT'
+      'RETURN'
+      'THEN'
+      'TRUE'
+      'UNTIL'
+      'WHILE'
+    )
+    StringAttri.Foreground = clBlue
+    SymbolAttri.Foreground = clRed
     Markup = False
     Entity = False
     DollarVariables = False

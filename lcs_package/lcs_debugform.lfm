@@ -1,7 +1,7 @@
 object frmDebug: TfrmDebug
-  Left = 275
+  Left = 0
   Height = 400
-  Top = 181
+  Top = 0
   Width = 640
   Caption = 'Debug Form'
   ChildSizing.LeftRightSpacing = 8
