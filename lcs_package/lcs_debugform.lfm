@@ -1,0 +1,21 @@
+object frmDebug: TfrmDebug
+  Left = 275
+  Height = 400
+  Top = 181
+  Width = 640
+  Caption = 'Debug Form'
+  ChildSizing.LeftRightSpacing = 8
+  ChildSizing.TopBottomSpacing = 8
+  ClientHeight = 400
+  ClientWidth = 640
+  OnCreate = FormCreate
+  LCLVersion = '1.6.0.4'
+  object memoDebug: TMemo
+    Left = 8
+    Height = 384
+    Top = 8
+    Width = 624
+    Align = alClient
+    TabOrder = 0
+  end
+end

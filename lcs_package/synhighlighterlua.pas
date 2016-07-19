@@ -56,7 +56,7 @@ Notes: July 17, 2016
 
 unit SynHighlighterLua;
 
-{$I SynEdit.inc}
+//{$I SynEdit.inc}
 
 interface
 

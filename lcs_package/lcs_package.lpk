@@ -11,7 +11,7 @@
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files Count="14">
+    <Files Count="16">
       <Item1>
         <Filename Value="lcs_application.pas"/>
         <UnitName Value="lcs_application"/>
@@ -21,54 +21,62 @@
         <UnitName Value="lcs_crypto"/>
       </Item2>
       <Item3>
-        <Filename Value="lcs_file.pas"/>
-        <UnitName Value="lcs_file"/>
+        <Filename Value="lcs_debug.pas"/>
+        <UnitName Value="lcs_debug"/>
       </Item3>
       <Item4>
-        <Filename Value="lcs_folder.pas"/>
-        <UnitName Value="lcs_folder"/>
+        <Filename Value="lcs_debugform.pas"/>
+        <UnitName Value="lcs_debugform"/>
       </Item4>
       <Item5>
-        <Filename Value="lcs_inifile.pas"/>
-        <UnitName Value="lcs_inifile"/>
+        <Filename Value="lcs_debugform.lfm"/>
+        <Type Value="LFM"/>
       </Item5>
       <Item6>
-        <Filename Value="lcs_registerall.pas"/>
-        <UnitName Value="lcs_registerall"/>
+        <Filename Value="lcs_file.pas"/>
+        <UnitName Value="lcs_file"/>
       </Item6>
       <Item7>
-        <Filename Value="lcs_registry.pas"/>
-        <UnitName Value="lcs_registry"/>
+        <Filename Value="lcs_folder.pas"/>
+        <UnitName Value="lcs_folder"/>
       </Item7>
       <Item8>
-        <Filename Value="lcs_string.pas"/>
-        <UnitName Value="lcs_string"/>
+        <Filename Value="lcs_inifile.pas"/>
+        <UnitName Value="lcs_inifile"/>
       </Item8>
       <Item9>
-        <Filename Value="lcs_table.pas"/>
-        <UnitName Value="lcs_table"/>
+        <Filename Value="lcs_registerall.pas"/>
+        <UnitName Value="lcs_registerall"/>
       </Item9>
       <Item10>
-        <Filename Value="lcs_textfile.pas"/>
-        <UnitName Value="lcs_textfile"/>
+        <Filename Value="lcs_registry.pas"/>
+        <UnitName Value="lcs_registry"/>
       </Item10>
       <Item11>
-        <Filename Value="lcs_zip.pas"/>
-        <UnitName Value="lcs_zip"/>
+        <Filename Value="lcs_string.pas"/>
+        <UnitName Value="lcs_string"/>
       </Item11>
       <Item12>
-        <Filename Value="lua53.pas"/>
-        <UnitName Value="lua53"/>
+        <Filename Value="lcs_table.pas"/>
+        <UnitName Value="lcs_table"/>
       </Item12>
       <Item13>
-        <Filename Value="synedit.inc"/>
-        <Type Value="Include"/>
+        <Filename Value="lcs_textfile.pas"/>
+        <UnitName Value="lcs_textfile"/>
       </Item13>
       <Item14>
+        <Filename Value="lcs_zip.pas"/>
+        <UnitName Value="lcs_zip"/>
+      </Item14>
+      <Item15>
+        <Filename Value="lua53.pas"/>
+        <UnitName Value="lua53"/>
+      </Item15>
+      <Item16>
         <Filename Value="synhighlighterlua.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="SynHighlighterLua"/>
-      </Item14>
+      </Item16>
     </Files>
     <RequiredPkgs Count="3">
       <Item1>
