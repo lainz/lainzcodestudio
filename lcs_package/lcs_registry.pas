@@ -170,8 +170,21 @@ begin
 end;
 
 function RegistrySetValue(L: Plua_State): integer; cdecl;
+var
+  reg: TRegistry;
 begin
-
+  reg := TRegistry.Create;
+  reg.RootKey := GetRootKey(lua_tointeger(L, -5));
+  reg.OpenKey(lua_tostring(L, -4), True);
+  case lua_tointeger(L, -1) of
+    1: reg.WriteString(lua_tostring(L, -3), lua_tostring(L, -2));
+    2: reg.WriteExpandString(lua_tostring(L, -3), lua_tostring(L, -2));
+    3: ;
+    4: reg.WriteInteger(lua_tostring(L, -3), lua_tointeger(L, -2));
+    7: ;
+  end;
+  reg.Free;
+  Result := 0;
 end;
 
 end.
