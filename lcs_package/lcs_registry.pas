@@ -5,7 +5,7 @@ unit lcs_registry;
 interface
 
 uses
-  Classes, SysUtils, Registry, Lua53;
+  Classes, SysUtils, Registry, LazUTF8, Lua53;
 
 procedure RegisterRegistry(L: Plua_State);
 
@@ -170,8 +170,23 @@ begin
 end;
 
 function RegistrySetValue(L: Plua_State): integer; cdecl;
+
+  function HexToStr(s: string): string;
+  var
+    i: integer;
+  begin
+    Result := '';
+    i := 1;
+    while i < Length(s) do
+    begin
+      Result := Result + Chr(StrToIntDef('$' + Copy(s, i, 2), 0));
+      Inc(i, 2);
+    end;
+  end;
+
 var
   reg: TRegistry;
+  Data: string;
 begin
   reg := TRegistry.Create;
   reg.RootKey := GetRootKey(lua_tointeger(L, -5));
@@ -179,7 +194,14 @@ begin
   case lua_tointeger(L, -1) of
     1: reg.WriteString(lua_tostring(L, -3), lua_tostring(L, -2));
     2: reg.WriteExpandString(lua_tostring(L, -3), lua_tostring(L, -2));
-    3: ;
+    3:
+    begin
+      Data := lua_tostring(L, -2);
+      Data := StringReplace(Data, ' ', '', [rfReplaceAll]);
+      Data := HexToStr(Data);
+      reg.WriteBinaryData(lua_tostring(L, -3), Data[1], (Length(Data)) *
+        SizeOf(byte));
+    end;
     4: reg.WriteInteger(lua_tostring(L, -3), lua_tointeger(L, -2));
     7: ;
   end;
@@ -188,4 +210,3 @@ begin
 end;
 
 end.
-
