@@ -19,7 +19,9 @@ function FileRun(L: Plua_State): integer; cdecl;
 implementation
 
 {$IFDEF WINDOWS}
-uses Windows;{$ENDIF}
+uses Windows;
+
+{$ENDIF}
 
 procedure RegisterFile(L: Plua_State);
 

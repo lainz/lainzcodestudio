@@ -107,8 +107,15 @@ begin
 end;
 
 function RegistryGetAccess(L: Plua_State): integer; cdecl;
+var
+  reg: TRegistry;
 begin
-
+  reg := TRegistry.Create;
+  reg.RootKey := GetRootKey(lua_tointeger(L, -3));
+  reg.Access := lua_tointeger(L, -1);
+  lua_pushboolean(L, reg.OpenKey(lua_tostring(L, -2), True));
+  reg.Free;
+  Result := 1;
 end;
 
 function RegistryGetKeyNames(L: Plua_State): integer; cdecl;
@@ -136,8 +143,53 @@ begin
 end;
 
 function RegistryGetValue(L: Plua_State): integer; cdecl;
-begin
 
+  function StringToHex(S: string): string;
+  var
+    I: integer;
+  begin
+    Result := '';
+    for I := 1 to length(S) do
+      Result := Result + IntToHex(Ord(S[i]), 2) + ' ';
+    Result := UTF8Copy(Result, 1, UTF8Length(Result) - 1);
+  end;
+
+var
+  reg: TRegistry;
+  Data: string;
+  Info: TRegDataInfo;
+begin
+  reg := TRegistry.Create;
+  reg.RootKey := GetRootKey(lua_tointeger(L, -3));
+  reg.OpenKeyReadOnly(lua_tostring(L, -2));
+  case reg.GetDataType(lua_tostring(L, -1)) of
+    rdUnknown:
+    begin
+      lua_pushstring(L, '');
+    end;
+    rdString:
+    begin
+      lua_pushstring(L, reg.ReadString(lua_tostring(L, -1)));
+    end;
+    rdExpandString:
+    begin
+      lua_pushstring(L, reg.ReadString(lua_tostring(L, -1)));
+    end;
+    rdBinary:
+    begin
+      reg.GetDataInfo(lua_tostring(L, -1), Info);
+      SetLength(Data, Info.DataSize);
+      reg.ReadBinaryData(lua_tostring(L, -1), Data[1], Length(Data));
+      Data := StringToHex(Data);
+      lua_pushstring(L, Data);
+    end;
+    rdInteger:
+    begin
+      lua_pushstring(L, IntToStr(reg.ReadInteger(lua_tostring(L, -1))));
+    end;
+  end;
+  reg.Free;
+  Result := 1;
 end;
 
 function RegistryGetValueNames(L: Plua_State): integer; cdecl;
@@ -165,8 +217,15 @@ begin
 end;
 
 function RegistryGetValueType(L: Plua_State): integer; cdecl;
+var
+  reg: TRegistry;
 begin
-
+  reg := TRegistry.Create;
+  reg.RootKey := GetRootKey(lua_tointeger(L, -3));
+  reg.OpenKeyReadOnly(lua_tostring(L, -2));
+  lua_pushinteger(L, integer(reg.GetDataType(lua_tostring(L, -1))));
+  reg.Free;
+  Result := 1;
 end;
 
 function RegistrySetValue(L: Plua_State): integer; cdecl;
