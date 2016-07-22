@@ -4,14 +4,15 @@ object frmMain: TfrmMain
   Top = 157
   Width = 800
   Caption = 'Lainz Code Studio'
-  ClientHeight = 600
+  ClientHeight = 575
   ClientWidth = 800
+  Menu = MainMenu1
   OnCreate = FormCreate
   Position = poScreenCenter
   LCLVersion = '1.6.0.4'
   inline SynEdit1: TSynEdit
     Left = 8
-    Height = 392
+    Height = 367
     Top = 40
     Width = 784
     Anchors = [akTop, akLeft, akRight, akBottom]
@@ -521,7 +522,7 @@ object frmMain: TfrmMain
   object ListBox1: TListBox
     Left = 8
     Height = 152
-    Top = 440
+    Top = 416
     Width = 784
     Anchors = [akLeft, akRight, akBottom]
     ItemHeight = 0
@@ -565,5 +566,45 @@ object frmMain: TfrmMain
     ActiveDot = False
     left = 608
     top = 56
+  end
+  object MainMenu1: TMainMenu
+    left = 496
+    top = 56
+    object MenuItem1: TMenuItem
+      Caption = 'File'
+      object MenuItem2: TMenuItem
+        Caption = 'Open...'
+        OnClick = MenuItem2Click
+      end
+      object MenuItem3: TMenuItem
+        Caption = 'Save As...'
+        OnClick = MenuItem3Click
+      end
+      object MenuItem4: TMenuItem
+        Caption = '-'
+      end
+      object MenuItem5: TMenuItem
+        Caption = 'Exit'
+        OnClick = MenuItem5Click
+      end
+    end
+    object MenuItem6: TMenuItem
+      Caption = 'Help'
+      object MenuItem7: TMenuItem
+        Caption = 'Wiki'
+        OnClick = MenuItem7Click
+      end
+    end
+  end
+  object OpenDialog1: TOpenDialog
+    Filter = 'Lua|*.lua'
+    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
+    left = 704
+    top = 56
+  end
+  object SaveDialog1: TSaveDialog
+    Filter = 'Lua|*.lua'
+    left = 704
+    top = 128
   end
 end

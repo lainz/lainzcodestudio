@@ -5,7 +5,8 @@ unit umain;
 interface
 
 uses
-  Classes, Forms, StdCtrls, Lua53, SynHighlighterLua, SynEdit;
+  Classes, Forms, StdCtrls, Menus, Dialogs, Lua53, SynHighlighterLua, SynEdit,
+  LCLIntF;
 
 type
 
@@ -14,10 +15,24 @@ type
   TfrmMain = class(TForm)
     btnBuildAndRun: TButton;
     ListBox1: TListBox;
+    MainMenu1: TMainMenu;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
+    MenuItem3: TMenuItem;
+    MenuItem4: TMenuItem;
+    MenuItem5: TMenuItem;
+    MenuItem6: TMenuItem;
+    MenuItem7: TMenuItem;
+    OpenDialog1: TOpenDialog;
+    SaveDialog1: TSaveDialog;
     SynEdit1: TSynEdit;
     SynLuaSyn1: TSynLuaSyn;
     procedure btnBuildAndRunClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure MenuItem2Click(Sender: TObject);
+    procedure MenuItem3Click(Sender: TObject);
+    procedure MenuItem5Click(Sender: TObject);
+    procedure MenuItem7Click(Sender: TObject);
   private
     { private declarations }
   public
@@ -57,6 +72,29 @@ begin
   SynEdit1.Font.Height := Canvas.GetTextHeight('Fpc');
   ListBox1.Font.Height := Canvas.GetTextHeight('Fpc');
   SynLuaSyn1.ActiveDot := True;
+  Caption := Application.Title;
+end;
+
+procedure TfrmMain.MenuItem2Click(Sender: TObject);
+begin
+  if OpenDialog1.Execute then
+    SynEdit1.Lines.LoadFromFile(OpenDialog1.FileName);
+end;
+
+procedure TfrmMain.MenuItem3Click(Sender: TObject);
+begin
+  if SaveDialog1.Execute then
+    SynEdit1.Lines.SaveToFile(SaveDialog1.FileName);
+end;
+
+procedure TfrmMain.MenuItem5Click(Sender: TObject);
+begin
+  Self.Close;
+end;
+
+procedure TfrmMain.MenuItem7Click(Sender: TObject);
+begin
+  OpenURL('https://github.com/lainz/lainzcodestudio/wiki');
 end;
 
 procedure TfrmMain.btnBuildAndRunClick(Sender: TObject);
