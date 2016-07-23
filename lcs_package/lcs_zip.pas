@@ -37,17 +37,58 @@ end;
 function ZipAdd(L: Plua_State): integer; cdecl;
 var
   zip: TZipper;
+  filename: string;
+  files: TStringList;
+  i: integer;
 begin
+  filename := lua_tostring(L, -2);
   zip := TZipper.Create;
+
+  files := TStringList.Create;
+
+  lua_pushnil(L);
+  while (lua_next(L, -2) <> 0) do
+  begin
+    files.Add(lua_tostring(L, -1));
+    lua_pop(L, 1);
+  end;
+
+  for i := 0 to files.Count - 1 do
+    zip.Entries.AddFileEntry(files[i], ExtractFileName(files[i]));
+
+  zip.FileName := filename;
+  zip.ZipAllFiles;
   zip.Free;
+  files.Free;
   Result := 0;
 end;
 
 function ZipExtract(L: Plua_State): integer; cdecl;
 var
   zip: TUnZipper;
+  filename: string;
+  destination: string;
+  files: TStringList;
+  i: integer;
 begin
+  filename := lua_tostring(L, -3);
+  destination := lua_tostring(L, -1);
   zip := TUnZipper.Create;
+  zip.FileName := filename;
+  zip.OutputPath := destination;
+
+  files := TStringList.Create;
+
+  lua_settop(L, -2);
+
+  lua_pushnil(L);
+  while (lua_next(L, -2) <> 0) do
+  begin
+    files.Add(lua_tostring(L, -1));
+    lua_pop(L, 1);
+  end;
+
+  zip.UnZipFiles(files);
   zip.Free;
   Result := 0;
 end;
