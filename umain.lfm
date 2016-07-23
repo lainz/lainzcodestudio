@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
-  Left = 95
+  Left = 90
   Height = 600
-  Top = 157
+  Top = 156
   Width = 800
   Caption = 'Lainz Code Studio'
   ClientHeight = 575
@@ -22,6 +22,7 @@ object frmMain: TfrmMain
     Font.Quality = fqCleartypeNatural
     ParentColor = False
     ParentFont = False
+    PopupMenu = PopupMenu1
     TabOrder = 0
     Gutter.Width = 57
     Gutter.MouseActions = <>
@@ -588,6 +589,69 @@ object frmMain: TfrmMain
         OnClick = MenuItem5Click
       end
     end
+    object MenuItem12: TMenuItem
+      Caption = 'Edit'
+      OnClick = MenuItem12Click
+      object MenuItem13: TMenuItem
+        Caption = 'Cut'
+        OnClick = SynEditCutToClipboard
+      end
+      object MenuItem14: TMenuItem
+        Caption = 'Copy'
+        OnClick = SynEditCopyToClipboard
+      end
+      object MenuItem15: TMenuItem
+        Caption = 'Paste'
+        OnClick = SynEditPasteFromClipboard
+      end
+      object MenuItem16: TMenuItem
+        Caption = 'Select All'
+        OnClick = SynEditSelectAll
+      end
+    end
+    object MenuItem17: TMenuItem
+      Caption = 'Insert'
+      object MenuItem27: TMenuItem
+        Caption = 'if then'
+        OnClick = MenuItem27Click
+      end
+      object MenuItem18: TMenuItem
+        Caption = 'if then else'
+        OnClick = MenuItem18Click
+      end
+      object MenuItem19: TMenuItem
+        Caption = 'while do'
+        OnClick = MenuItem19Click
+      end
+      object MenuItem20: TMenuItem
+        Caption = 'repeat until'
+        OnClick = MenuItem20Click
+      end
+      object MenuItem21: TMenuItem
+        Caption = 'for do'
+        OnClick = MenuItem21Click
+      end
+      object MenuItem22: TMenuItem
+        Caption = 'for in ipairs do'
+        OnClick = MenuItem22Click
+      end
+      object MenuItem23: TMenuItem
+        Caption = 'for in pairs do'
+        OnClick = MenuItem23Click
+      end
+      object MenuItem24: TMenuItem
+        Caption = 'function'
+        OnClick = MenuItem24Click
+      end
+      object MenuItem25: TMenuItem
+        Caption = 'comment'
+        OnClick = MenuItem25Click
+      end
+      object MenuItem26: TMenuItem
+        Caption = 'multi-line comment'
+        OnClick = MenuItem26Click
+      end
+    end
     object MenuItem6: TMenuItem
       Caption = 'Help'
       object MenuItem7: TMenuItem
@@ -604,7 +668,29 @@ object frmMain: TfrmMain
   end
   object SaveDialog1: TSaveDialog
     Filter = 'Lua|*.lua'
+    Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
     left = 704
     top = 128
+  end
+  object PopupMenu1: TPopupMenu
+    OnPopup = PopupMenu1Popup
+    left = 704
+    top = 223
+    object MenuItem10: TMenuItem
+      Caption = 'Cut'
+      OnClick = SynEditCutToClipboard
+    end
+    object MenuItem8: TMenuItem
+      Caption = 'Copy'
+      OnClick = SynEditCopyToClipboard
+    end
+    object MenuItem9: TMenuItem
+      Caption = 'Paste'
+      OnClick = SynEditPasteFromClipboard
+    end
+    object MenuItem11: TMenuItem
+      Caption = 'Select All'
+      OnClick = SynEditSelectAll
+    end
   end
 end

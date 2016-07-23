@@ -12,7 +12,7 @@ uses
 {$R *.res}
 
 begin
-  Application.Title:='Lainz Code Studio 0.1';
+  Application.Title:='Lainz Code Studio 0.2';
   RequireDerivedFormResource:=True;
   Application.Initialize;
   Application.CreateForm(TfrmMain, frmMain);
