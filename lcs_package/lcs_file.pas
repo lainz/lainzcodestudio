@@ -91,7 +91,8 @@ var
 begin
   process := TProcessUTF8.Create(nil);
   process.CurrentDirectory := lua_tostring(L, -3);
-  process.Parameters.Add(lua_tostring(L, -4));
+  process.Parameters.Delimiter := ' ';
+  process.Parameters.DelimitedText := (lua_tostring(L, -4));
   process.Executable := lua_tostring(L, -5);
 
   case lua_tointeger(L, -2) of
