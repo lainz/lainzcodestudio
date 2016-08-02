@@ -36,6 +36,7 @@ type
     MenuItem25: TMenuItem;
     MenuItem26: TMenuItem;
     MenuItem27: TMenuItem;
+    MenuItem28: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItem5: TMenuItem;
@@ -61,6 +62,7 @@ type
     procedure MenuItem25Click(Sender: TObject);
     procedure MenuItem26Click(Sender: TObject);
     procedure MenuItem27Click(Sender: TObject);
+    procedure MenuItem28Click(Sender: TObject);
     procedure SynEditCutToClipboard(Sender: TObject);
     procedure SynEditSelectAll(Sender: TObject);
     procedure MenuItem2Click(Sender: TObject);
@@ -72,6 +74,7 @@ type
     procedure PopupMenu1Popup(Sender: TObject);
   private
     { private declarations }
+    FileName: string;
   public
     { public declarations }
   end;
@@ -170,6 +173,22 @@ begin
   SynEdit1.InsertTextAtCaret('if () then' + LineEnding + LineEnding + 'end');
 end;
 
+procedure TfrmMain.MenuItem28Click(Sender: TObject);
+begin
+  if FileName <> '' then
+  begin
+    SynEdit1.Lines.SaveToFile(FileName);
+  end
+  else
+  begin
+    if SaveDialog1.Execute then
+    begin
+      FileName := SaveDialog1.FileName;
+      SynEdit1.Lines.SaveToFile(SaveDialog1.FileName);
+    end;
+  end;
+end;
+
 procedure TfrmMain.SynEditCutToClipboard(Sender: TObject);
 begin
   SynEdit1.CutToClipboard;
@@ -183,13 +202,19 @@ end;
 procedure TfrmMain.MenuItem2Click(Sender: TObject);
 begin
   if OpenDialog1.Execute then
+  begin
+    FileName := OpenDialog1.FileName;
     SynEdit1.Lines.LoadFromFile(OpenDialog1.FileName);
+  end;
 end;
 
 procedure TfrmMain.MenuItem3Click(Sender: TObject);
 begin
   if SaveDialog1.Execute then
+  begin
+    FileName := SaveDialog1.FileName;
     SynEdit1.Lines.SaveToFile(SaveDialog1.FileName);
+  end;
 end;
 
 procedure TfrmMain.MenuItem5Click(Sender: TObject);

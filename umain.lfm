@@ -577,6 +577,10 @@ object frmMain: TfrmMain
         Caption = 'Open...'
         OnClick = MenuItem2Click
       end
+      object MenuItem28: TMenuItem
+        Caption = 'Save'
+        OnClick = MenuItem28Click
+      end
       object MenuItem3: TMenuItem
         Caption = 'Save As...'
         OnClick = MenuItem3Click
