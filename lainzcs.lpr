@@ -7,7 +7,7 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, umain, uhighdpi, lcs_debugform;
+  Forms, umain, uhighdpi, lcs_debugform, lcs_dialog_input;
 
 {$R *.res}
 
@@ -17,6 +17,7 @@ begin
   Application.Initialize;
   Application.CreateForm(TfrmMain, frmMain);
   Application.CreateForm(TfrmDebug, frmDebug);
+  Application.CreateForm(Tfrm_lcs_dialog_input, frm_lcs_dialog_input);
   HighDPI(96);
   Application.Run;
 end.
