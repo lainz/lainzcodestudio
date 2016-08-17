@@ -12,6 +12,16 @@ procedure RegisterHTTP(L: Plua_State);
 function HTTPDownload(L: Plua_State): integer; cdecl;
 function HTTPGetFileSize(L: Plua_State): integer; cdecl;
 
+type
+
+  { THTTPGetFileSize }
+
+  THTTPGetFileSize = class
+  public
+    constructor Create(L: Plua_State);
+    procedure DoDataReceived(Sender: TObject; const ContentLength, CurrentPos: int64);
+  end;
+
 implementation
 
 procedure RegisterHTTP(L: Plua_State);
@@ -59,37 +69,55 @@ end;
 
 function HTTPGetFileSize(L: Plua_State): integer; cdecl;
 var
-  client: TFPHTTPClient;
-  s, url, username, password: string;
-  i: integer;
-  VSize: int64 = 0;
+  GetFileSize: THTTPGetFileSize;
 begin
-  client := TFPHTTPClient.Create(nil);
-  url := lua_tostring(L, -3);
-  username := lua_tostring(L, -2);
-  password := lua_tostring(L, -1);
-  if username <> '' then
-    client.UserName := username;
-  if password <> '' then
-    client.Password := password;
-  client.AllowRedirect := True;
-  try
-    client.HTTPMethod('HEAD', url, nil, [200]);
-    for i := 0 to pred(client.ResponseHeaders.Count) do
-    begin
-      s := UpperCase(client.ResponseHeaders[i]);
-      if Pos('CONTENT-LENGTH:', s) > 0 then
-      begin
-        VSize := StrToIntDef(Copy(s, Pos(':', s) + 1, Length(s)), -1);
-        Break;
-      end;
-    end;
-  finally
-    client.Free;
-  end;
-  lua_pushinteger(L, VSize);
+  GetFileSize := THTTPGetFileSize.Create(L);
+  GetFileSize.Free;
   Result := 1;
 end;
 
-end.
+{ THTTPGetFileSize }
 
+constructor THTTPGetFileSize.Create(L: Plua_State);
+var
+  client: TFPHTTPClient;
+  s, url, username, password: string;
+  i: integer;
+  VSize: int64 = -1;
+  LStringStream: TStringStream;
+begin
+  LStringStream := TStringStream.Create('');
+  try
+    client := TFPHTTPClient.Create(nil);
+    url := lua_tostring(L, -3);
+    username := lua_tostring(L, -2);
+    password := lua_tostring(L, -1);
+    if username <> '' then
+      client.UserName := username;
+    if password <> '' then
+      client.Password := password;
+    client.AllowRedirect := True;
+    client.OnDataReceived := @DoDataReceived;
+    client.ResponseHeaders.NameValueSeparator := ':';
+    try
+      client.HTTPMethod('GET', url, LStringStream, []);
+    except
+    end;
+    VSize := StrToIntDef(client.ResponseHeaders.Values['CONTENT-LENGTH'], -1);
+  finally
+    client.Free;
+    LStringStream.Free;
+  end;
+  lua_pushinteger(L, VSize);
+end;
+
+procedure THTTPGetFileSize.DoDataReceived(Sender: TObject;
+  const ContentLength, CurrentPos: int64);
+begin
+  if ContentLength > 0 then
+  begin
+    Abort;
+  end;
+end;
+
+end.
