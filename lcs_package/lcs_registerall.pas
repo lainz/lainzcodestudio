@@ -14,7 +14,7 @@ implementation
 uses
   lcs_string, lcs_inifile, lcs_registry, lcs_textfile, lcs_zip, lcs_table,
   lcs_crypto, lcs_folder, lcs_file, lcs_application, lcs_debug, lcs_dialog,
-  lcs_http;
+  lcs_http, lcs_ftpwi;
 
 procedure RegisterAll(L: Plua_State; S: TStrings);
 begin
@@ -31,6 +31,7 @@ begin
   RegisterDebug(L);
   RegisterDialog(L);
   RegisterHTTP(L);
+  RegisterFTPWI(L);
 end;
 
 end.
