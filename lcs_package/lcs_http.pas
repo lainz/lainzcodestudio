@@ -11,6 +11,7 @@ procedure RegisterHTTP(L: Plua_State);
 
 function HTTPDownload(L: Plua_State): integer; cdecl;
 function HTTPGetFileSize(L: Plua_State): integer; cdecl;
+function HTTPSubmit(L: Plua_State): integer; cdecl;
 
 type
 
@@ -41,6 +42,8 @@ begin
   RegisterFunction('DownloadSecure', @HTTPDownload);
   RegisterFunction('GetFileSize', @HTTPGetFileSize);
   RegisterFunction('GetFileSizeSecure', @HTTPGetFileSize);
+  RegisterFunction('Submit', @HTTPSubmit);
+  RegisterFunction('SubmitSecute', @HTTPSubmit);
   lua_setglobal(L, 'HTTP');
 end;
 
@@ -76,13 +79,65 @@ begin
   Result := 1;
 end;
 
+function HTTPSubmit(L: Plua_State): integer; cdecl;
+var
+  client: TFPHTTPClient;
+  method: integer;
+  url, username, password, res: string;
+  s: TStringList;
+begin
+  try
+    s := TStringList.Create;
+    client := TFPHTTPClient.Create(nil);
+    url := lua_tostring(L, -5);
+    method := lua_tointeger(L, -3);
+    username := lua_tostring(L, -2);
+    password := lua_tostring(L, -1);
+
+    if username <> '' then
+      client.UserName := username;
+    if password <> '' then
+      client.Password := password;
+    client.AllowRedirect := True;
+    client.AddHeader('User-Agent','Mozilla/5.0 (compatible; fpweb)');
+
+    lua_pushnil(L);
+    while (lua_next(L, -5) <> 0) do
+    begin
+      s.Add(lua_tostring(L, -2) + '=' + lua_tostring(L, -1));
+      lua_pop(L, 1);
+    end;
+
+    s.QuoteChar := char('');
+    s.Delimiter := '&';
+    s.StrictDelimiter := True;
+    res := '';
+
+    case method of
+      1:
+      begin
+        res := client.Get(url + '?' + s.DelimitedText);
+      end;
+      0:
+      begin
+        res := client.FormPost(url, s);
+      end;
+    end;
+
+  finally
+    client.Free;
+    s.Free;
+  end;
+  lua_pushstring(L, res);
+  Result := 1;
+end;
+
 { THTTPGetFileSize }
 
 constructor THTTPGetFileSize.Create(L: Plua_State);
 var
   client: TFPHTTPClient;
-  s, url, username, password: string;
-  i: integer;
+  url, username, password: string;
   VSize: int64 = -1;
   LStringStream: TStringStream;
 begin
