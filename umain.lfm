@@ -511,13 +511,13 @@ object frmMain: TfrmMain
       end
     end
   end
-  object btnBuildAndRun: TButton
+  object btnRun: TButton
     Left = 8
     Height = 25
     Top = 8
     Width = 115
-    Caption = 'Build and Run'
-    OnClick = btnBuildAndRunClick
+    Caption = 'Run'
+    OnClick = btnRunClick
     TabOrder = 1
   end
   object ListBox1: TListBox

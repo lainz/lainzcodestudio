@@ -13,7 +13,7 @@ type
   { TfrmMain }
 
   TfrmMain = class(TForm)
-    btnBuildAndRun: TButton;
+    btnRun: TButton;
     ListBox1: TListBox;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
@@ -49,7 +49,7 @@ type
     SaveDialog1: TSaveDialog;
     SynEdit1: TSynEdit;
     SynLuaSyn1: TSynLuaSyn;
-    procedure btnBuildAndRunClick(Sender: TObject);
+    procedure btnRunClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure MenuItem12Click(Sender: TObject);
     procedure MenuItem18Click(Sender: TObject);
@@ -243,7 +243,7 @@ begin
   MenuItem10.Enabled := SynEdit1.SelAvail;
 end;
 
-procedure TfrmMain.btnBuildAndRunClick(Sender: TObject);
+procedure TfrmMain.btnRunClick(Sender: TObject);
 var
   L: Plua_State;
   S: TStringList;

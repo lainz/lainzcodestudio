@@ -20,8 +20,8 @@
       <StringTable ProductVersion=""/>
     </VersionInfo>
     <BuildModes Count="2">
-      <Item1 Name="Debug" Default="True"/>
-      <Item2 Name="Release">
+      <Item1 Name="Debug x86" Default="True"/>
+      <Item2 Name="Release x86">
         <CompilerOptions>
           <Version Value="11"/>
           <PathDelim Value="\"/>
@@ -34,6 +34,7 @@
           </SearchPaths>
           <CodeGeneration>
             <SmartLinkUnit Value="True"/>
+            <TargetCPU Value="i386"/>
             <Optimizations>
               <OptimizationLevel Value="3"/>
             </Optimizations>
@@ -111,6 +112,7 @@
         <OverflowChecks Value="True"/>
         <StackChecks Value="True"/>
       </Checks>
+      <TargetCPU Value="i386"/>
     </CodeGeneration>
     <Linking>
       <Debugging>
