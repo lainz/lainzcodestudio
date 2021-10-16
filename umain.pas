@@ -102,8 +102,32 @@ begin
 end;
 
 function print(L: Plua_State): integer; cdecl;
+const
+  Sep = ' '; // or ''?
+var
+  I, N, T: Integer;
+  S, Si: String;
 begin
-  frmMain.ListBox1.Items.AddText(lua_tostring(L, -1));
+  S := '';
+  N := lua_gettop(L);
+  for I := 1 to N do
+  begin
+    T := lua_type(L, I);
+    case T of
+      LUA_TSTRING, LUA_TNUMBER:
+        Si := lua_tostring(L, I);
+      LUA_TBOOLEAN:
+        if lua_toboolean(L, I) then
+          Si := 'true' else
+          Si := 'false';
+      otherwise
+    	Si := '(' + lua_typename(L, T) + ')';
+    end;
+    if S = '' then
+      S := Si else
+      S := S + Sep + Si;
+  end;
+  frmMain.ListBox1.Items.AddText(S);
   Result := 0;
 end;
 
