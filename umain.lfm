@@ -1,24 +1,23 @@
 object frmMain: TfrmMain
   Left = 178
-  Height = 750
+  Height = 600
   Top = 128
-  Width = 1000
+  Width = 800
   Caption = 'Lainz Code Studio'
-  ClientHeight = 725
-  ClientWidth = 1000
-  DesignTimePPI = 120
+  ClientHeight = 578
+  ClientWidth = 800
   Menu = MainMenu1
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poScreenCenter
   LCLVersion = '1.9.0.0'
   inline Editor: TSynEdit
-    Left = 10
-    Height = 465
-    Top = 50
-    Width = 980
+    Left = 8
+    Height = 370
+    Top = 40
+    Width = 784
     Anchors = [akTop, akLeft, akRight, akBottom]
-    Font.Height = -16
+    Font.Height = -13
     Font.Name = 'Courier New'
     Font.Pitch = fpFixed
     Font.Quality = fqCleartypeNatural
@@ -27,7 +26,7 @@ object frmMain: TfrmMain
     PopupMenu = PopupMenu1
     TabOrder = 0
     BookMarkOptions.BookmarkImages = ImageList2
-    Gutter.Width = 80
+    Gutter.Width = 60
     Gutter.MouseActions = <>
     RightGutter.Width = 0
     RightGutter.MouseActions = <>
@@ -482,11 +481,11 @@ object frmMain: TfrmMain
     OnSpecialLineColors = EditorSpecialLineColors
     inline SynLeftGutterPartList1: TSynGutterPartList
       object SynGutterMarks1: TSynGutterMarks
-        Width = 30
+        Width = 24
         MouseActions = <>
       end
       object SynGutterLineNumber1: TSynGutterLineNumber
-        Width = 26
+        Width = 17
         MouseActions = <>
         MarkupInfo.Background = clBtnFace
         MarkupInfo.Foreground = clNone
@@ -496,20 +495,20 @@ object frmMain: TfrmMain
         LeadingZeros = False
       end
       object SynGutterChanges1: TSynGutterChanges
-        Width = 5
+        Width = 4
         MouseActions = <>
         ModifiedColor = 59900
         SavedColor = clGreen
       end
       object SynGutterSeparator1: TSynGutterSeparator
-        Width = 3
+        Width = 2
         MouseActions = <>
         MarkupInfo.Background = clWhite
         MarkupInfo.Foreground = clGray
       end
       object SynGutterCodeFolding1: TSynGutterCodeFolding
         AutoSize = False
-        Width = 16
+        Width = 13
         MouseActions = <>
         MarkupInfo.Background = clNone
         MarkupInfo.Foreground = clGray
@@ -519,74 +518,93 @@ object frmMain: TfrmMain
     end
   end
   object btnRun: TButton
-    Left = 10
-    Height = 31
-    Top = 10
-    Width = 144
+    Left = 8
+    Height = 25
+    Top = 8
+    Width = 115
     Caption = 'Run'
     OnClick = btnRunClick
     ParentFont = False
     TabOrder = 1
   end
   object ListBox1: TListBox
-    Left = 10
-    Height = 190
-    Top = 526
-    Width = 980
+    Left = 8
+    Height = 152
+    Top = 419
+    Width = 784
     Anchors = [akLeft, akRight, akBottom]
     ItemHeight = 0
     ParentFont = False
     TabOrder = 2
   end
   object SpeedButton1: TSpeedButton
-    Left = 205
-    Height = 32
-    Top = 8
-    Width = 48
+    Left = 144
+    Height = 26
+    Top = 7
+    Width = 38
     Action = actRun
+    ParentFont = False
   end
   object SpeedButton2: TSpeedButton
-    Left = 258
-    Height = 32
-    Top = 8
-    Width = 92
+    Left = 184
+    Height = 26
+    Top = 7
+    Width = 70
     Action = actFreeRun
+    ParentFont = False
   end
   object SpeedButton3: TSpeedButton
-    Left = 355
-    Height = 32
-    Top = 8
-    Width = 92
+    Left = 256
+    Height = 26
+    Top = 7
+    Width = 54
     Action = actPause
+    ParentFont = False
   end
   object SpeedButton4: TSpeedButton
-    Left = 452
-    Height = 32
-    Top = 8
-    Width = 92
+    Left = 312
+    Height = 26
+    Top = 7
+    Width = 70
     Action = actStepInto
+    ParentFont = False
   end
   object SpeedButton5: TSpeedButton
-    Left = 549
-    Height = 32
-    Top = 8
-    Width = 92
+    Left = 384
+    Height = 26
+    Top = 7
+    Width = 74
     Action = actStepOver
+    ParentFont = False
   end
   object SpeedButton6: TSpeedButton
-    Left = 646
-    Height = 32
+    Left = 460
+    Height = 26
     Top = 8
-    Width = 92
+    Width = 54
     Action = actStop
+    ParentFont = False
   end
   object lblScriptState: TLabel
-    Left = 756
-    Height = 20
-    Top = 16
-    Width = 89
+    Left = 520
+    Height = 16
+    Top = 13
+    Width = 76
     Caption = 'lblScriptState'
     ParentColor = False
+    ParentFont = False
+  end
+  object moWatches: TMemo
+    Left = 630
+    Height = 578
+    Top = 0
+    Width = 170
+    Align = alRight
+    BorderStyle = bsNone
+    Color = clCream
+    ParentFont = False
+    TabOrder = 3
+    WordWrap = False
   end
   object SynLuaSyn1: TSynLuaSyn
     Enabled = False
@@ -624,12 +642,12 @@ object frmMain: TfrmMain
     Entity = False
     DollarVariables = False
     ActiveDot = False
-    Left = 760
-    Top = 70
+    Left = 608
+    Top = 56
   end
   object MainMenu1: TMainMenu
-    Left = 620
-    Top = 70
+    Left = 496
+    Top = 56
     object MenuItem1: TMenuItem
       Caption = 'File'
       object MenuItem2: TMenuItem
@@ -726,19 +744,19 @@ object frmMain: TfrmMain
   object OpenDialog1: TOpenDialog
     Filter = 'Lua|*.lua'
     Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
-    Left = 880
-    Top = 70
+    Left = 704
+    Top = 56
   end
   object SaveDialog1: TSaveDialog
     Filter = 'Lua|*.lua'
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
-    Left = 880
-    Top = 160
+    Left = 704
+    Top = 128
   end
   object PopupMenu1: TPopupMenu
     OnPopup = PopupMenu1Popup
-    Left = 880
-    Top = 279
+    Left = 704
+    Top = 223
     object MenuItem10: TMenuItem
       Caption = 'Cut'
       OnClick = SynEditCutToClipboard
@@ -757,8 +775,8 @@ object frmMain: TfrmMain
     end
   end
   object ImageList2: TImageList
-    Left = 589
-    Top = 299
+    Left = 471
+    Top = 239
     Bitmap = {
       4C690B0000001000000010000000000000000000000000000000C6834F01C582
       4F38C3814E9EC07F4DDDBD7D4CFFB97B4BFFB6794ADDB277499EAF754838AC73
@@ -1116,8 +1134,8 @@ object frmMain: TfrmMain
     }
   end
   object ActionList1: TActionList
-    Left = 716
-    Top = 298
+    Left = 573
+    Top = 238
     object actRun: TAction
       Category = 'Run'
       Caption = 'Run'
@@ -1148,6 +1166,12 @@ object frmMain: TfrmMain
       Category = 'Run'
       Caption = 'Stop'
       OnExecute = actStopExecute
+    end
+    object actWatch: TAction
+      Category = 'Run'
+      Caption = 'Watch'
+      OnExecute = actWatchExecute
+      ShortCut = 16500
     end
   end
 end

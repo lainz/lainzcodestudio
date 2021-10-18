@@ -18,6 +18,7 @@ type
 
   TfrmMain = class(TForm)
     actFreeRun: TAction;
+    actWatch: TAction;
     actStop: TAction;
     actPause: TAction;
     actStepInto: TAction;
@@ -57,6 +58,7 @@ type
     MenuItem7: TMenuItem;
     MenuItem8: TMenuItem;
     MenuItem9: TMenuItem;
+    moWatches: TMemo;
     OpenDialog1: TOpenDialog;
     PopupMenu1: TPopupMenu;
     SaveDialog1: TSaveDialog;
@@ -75,6 +77,7 @@ type
     procedure actStepIntoExecute(Sender: TObject);
     procedure actStepOverExecute(Sender: TObject);
     procedure actStopExecute(Sender: TObject);
+    procedure actWatchExecute(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
     procedure EditorSpecialLineColors(Sender: TObject; Line: integer;
       var Special: boolean; var FG, BG: TColor);
@@ -120,6 +123,8 @@ type
     procedure DoResume(AStep: TScriptDbgStates);
     procedure DoStop(AReset: Boolean);
     procedure ShowError(AErrorMsg: String);
+    function GetVarContents(AId: String): String;
+    procedure UpdateWatches;
   public
     { public declarations }
   end;
@@ -135,6 +140,11 @@ uses
 {$R *.lfm}
 
 const
+  // Identifier characters
+  ID_FIRST = ['A'..'Z', 'a'..'z', '_'];
+  ID_SYMBOL = ID_FIRST + ['0'..'9'];
+  ID_DELIMITERS = [#9..#127] - ID_SYMBOL;
+
   // Special line colors
   FG_ACTIVE = clWhite;
   BG_ACTIVE = clBlue;
@@ -168,8 +178,9 @@ end;
 
 procedure DbgHook(L: Plua_State; ar: Plua_Debug); cdecl;
 var
-  MustYield: Boolean;
+  MustYield, AtBkpt: Boolean;
 begin
+  Application.ProcessMessages;
   MustYield := False;
   case ar^.event of
     LUA_HOOKCALL:
@@ -178,7 +189,6 @@ begin
       Dec(Script.CallDepth);
     LUA_HOOKLINE:
       begin
-        Application.ProcessMessages;
         Script.SrcLine := ar^.currentline - Script.LOfs;
         MustYield := Script.StopRq or Script.ResetRq;
         if
@@ -187,12 +197,11 @@ begin
           (Script.SrcLine > 0)
         then
         begin
+          AtBkpt := frmMain.HasBkptAtLine(Script.SrcLine);
           if (ssStepOver in Script.State) then
-            MustYield := (Script.CallDepth <= Script.ReqDepth)
-          else if (ssStepInto in Script.State) or
-              frmMain.HasBkptAtLine(Script.SrcLine)
-            then
-              MustYield := True;
+            MustYield := (Script.CallDepth <= Script.ReqDepth) or AtBkpt
+          else
+            MustYield := (ssStepInto in Script.State) or AtBkpt;
         end;
       end;
   end;
@@ -384,7 +393,7 @@ var
   Mark: TSynEditMark;
 begin
   Mark := BkptAtLine(Line);
-  if Mark <> Nil   then
+  if Mark <> Nil then
     repeat
       Editor.Marks.Remove(Mark);
       Mark.Free;
@@ -526,9 +535,7 @@ begin
     Exclude(Script.State, ssFreeRun);
     Include(Script.State, ssPaused);
     CaretPos(Script.SrcLine, 1);
-
     ShowScriptState;
-
     if Script.StopRq or Script.ResetRq then
     begin
       Script.StopRq := False;
@@ -539,6 +546,7 @@ begin
   else
     ScriptFinalize(stat);
   Editor.Refresh;
+  UpdateWatches;
 end;
 
 procedure TfrmMain.DoStop(AReset: Boolean);
@@ -550,6 +558,108 @@ end;
 procedure TfrmMain.ShowError(AErrorMsg: String);
 begin
   ListBox1.Items.Add(Format('Line %d: ', [Script.SrcLine]) + AErrorMsg);
+end;
+
+function TfrmMain.GetVarContents(AId: String): String;
+var
+  T: Integer;
+  S: String;
+
+  function AddQuoted(S: String): String;
+  var
+    C: Char;
+  begin
+    Result := '"';
+    for C in S do
+      if C in [#0, #7, #8, #9, #10, #11, #12, #13, '"', '''', '\'] then
+        case C of
+           #0: Result := Result + '\0';
+           #7: Result := Result + '\a';
+           #8: Result := Result + '\b';
+           #9: Result := Result + '\t';
+          #10: Result := Result + '\n';
+          #11: Result := Result + '\v';
+          #12: Result := Result + '\f';
+          #13: Result := Result + '\r';
+        otherwise
+          Result := Result + '\' + C;
+        end
+      else if C < ' ' then
+        Result := Result + '\' + RightStr('000' + IntToStr(Ord(C)), 3)
+      else
+        Result := Result + C;
+    Result := Result + '"';
+  end;
+
+  function TblToString(L: Plua_State; N: Integer): String;
+  begin
+    Result := '{';
+    lua_pushnil(L);
+    while lua_next(L, -2) <> 0 do
+      try
+        lua_pushvalue(L, -2);
+        try
+          Result := Result + lua_tostring(L, -1) + ' => ';
+        finally
+          lua_pop(L, 1);
+        end;
+        if lua_istable(L, -1) then
+          Result := Result + TblToString(L, N + 1)
+        else if lua_isstring(L, -1) then
+          Result := Result + AddQuoted(lua_tostring(L, -1))
+        else
+          Result := Result + lua_tostring(L, -1);
+
+        Result := Result + ', ';
+      finally
+        lua_pop(L, 1);
+      end;
+    Result := Result + '}';
+  end;
+
+begin
+  Result := '';
+  if not (ssRunning in Script.State) then
+    Exit;
+  T := lua_getglobal(Script.Lt, PChar(AId));
+  try
+    case T of
+      LUA_TSTRING:
+        S := AddQuoted(lua_tostring(Script.Lt, -1));
+      LUA_TNUMBER:
+        S := lua_tostring(Script.Lt, -1);
+      LUA_TNIL:
+        S := 'nil';
+      LUA_TBOOLEAN:
+        if lua_toboolean(Script.Lt, -1) then
+          S := 'true' else
+          S := 'false';
+      LUA_TTABLE:
+          S := TblToString(Script.Lt, 1);
+      otherwise
+        S := '(' + lua_typename(Script.Lt, T) + ')';
+    end;
+  finally
+    lua_pop(Script.Lt, 1);
+  end;
+  Result := S;
+end;
+
+procedure TfrmMain.UpdateWatches;
+var
+  SID, Cont: String;
+  I: Integer;
+begin
+  for I := 0 to Pred(moWatches.Lines.Count) do
+  begin
+    SID := Trim(ExtractWord(1, moWatches.Lines[I], ID_DELIMITERS));
+    if (SID = '') or not (SID[1] in ID_FIRST) then
+      Continue;
+    if (ssRunning in Script.State) then
+      Cont := GetVarContents(SID) else
+      Cont := '(not running)';
+    moWatches.Lines[I] := SID + ' = ' + Cont;
+  end;
 end;
 
 procedure TfrmMain.btnRunClick(Sender: TObject);
@@ -592,6 +702,31 @@ begin
   if ssPaused in Script.State then
     ScriptFinalize(0) else
     Script.ResetRq := True;
+end;
+
+procedure TfrmMain.actWatchExecute(Sender: TObject);
+var
+  S, SID, Cont: String;
+  I: Integer = 0;
+begin
+  S := Trim(Editor.SelText);
+  if S = '' then
+  begin
+    S := Trim(InputBox('Watch', 'Variable', ''));
+    //luaL_dostring(Script.Lt, PChar('print('+S+')'));
+  end;
+  if S = '' then
+    Exit;
+  for I := 1 to 10 do
+  begin
+    SID := ExtractWord(I, S, ID_DELIMITERS);
+    if SID = '' then
+      Break;
+    if not (SID[1] in ID_FIRST) then
+      Continue;
+    Cont := GetVarContents(SID);
+    moWatches.Lines.Add(SID + ' = ' + Cont);
+  end;
 end;
 
 procedure TfrmMain.EditorSpecialLineColors(Sender: TObject; Line: integer;

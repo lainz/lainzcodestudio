@@ -5,3 +5,4 @@
 *.res
 backup/*
 lib
+/lua53.dll
