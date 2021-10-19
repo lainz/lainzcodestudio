@@ -7,6 +7,7 @@ object frmMain: TfrmMain
   ClientHeight = 578
   ClientWidth = 800
   Menu = MainMenu1
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poScreenCenter
@@ -531,7 +532,7 @@ object frmMain: TfrmMain
     Left = 8
     Height = 152
     Top = 419
-    Width = 784
+    Width = 576
     Anchors = [akLeft, akRight, akBottom]
     ItemHeight = 0
     ParentFont = False
@@ -580,7 +581,7 @@ object frmMain: TfrmMain
   object SpeedButton6: TSpeedButton
     Left = 460
     Height = 26
-    Top = 8
+    Top = 7
     Width = 54
     Action = actStop
     ParentFont = False
@@ -595,12 +596,11 @@ object frmMain: TfrmMain
     ParentFont = False
   end
   object moWatches: TMemo
-    Left = 630
-    Height = 578
-    Top = 0
-    Width = 170
-    Align = alRight
-    BorderStyle = bsNone
+    Left = 588
+    Height = 153
+    Top = 418
+    Width = 204
+    Anchors = [akRight, akBottom]
     Color = clCream
     ParentFont = False
     TabOrder = 3
@@ -731,6 +731,33 @@ object frmMain: TfrmMain
       object MenuItem26: TMenuItem
         Caption = 'multi-line comment'
         OnClick = MenuItem26Click
+      end
+    end
+    object MenuItem29: TMenuItem
+      Caption = 'Run'
+      object MenuItem30: TMenuItem
+        Action = actRun
+      end
+      object MenuItem31: TMenuItem
+        Action = actFreeRun
+      end
+      object MenuItem32: TMenuItem
+        Action = actPause
+      end
+      object MenuItem33: TMenuItem
+        Action = actStepInto
+      end
+      object MenuItem34: TMenuItem
+        Action = actStepOver
+      end
+      object MenuItem35: TMenuItem
+        Action = actStop
+      end
+      object MenuItem36: TMenuItem
+        Caption = '-'
+      end
+      object MenuItem37: TMenuItem
+        Action = actToggleBkpt
       end
     end
     object MenuItem6: TMenuItem
@@ -1141,11 +1168,13 @@ object frmMain: TfrmMain
       Caption = 'Run'
       OnExecute = actRunExecute
       OnUpdate = actRunUpdate
+      ShortCut = 120
     end
     object actFreeRun: TAction
       Category = 'Run'
       Caption = 'Free Run'
       OnExecute = actFreeRunExecute
+      ShortCut = 24696
     end
     object actPause: TAction
       Category = 'Run'
@@ -1156,22 +1185,31 @@ object frmMain: TfrmMain
       Category = 'Run'
       Caption = 'Step Into'
       OnExecute = actStepIntoExecute
+      ShortCut = 118
     end
     object actStepOver: TAction
       Category = 'Run'
       Caption = 'Step Over'
       OnExecute = actStepOverExecute
+      ShortCut = 119
     end
     object actStop: TAction
       Category = 'Run'
       Caption = 'Stop'
       OnExecute = actStopExecute
+      ShortCut = 16497
     end
     object actWatch: TAction
       Category = 'Run'
       Caption = 'Watch'
       OnExecute = actWatchExecute
       ShortCut = 16500
+    end
+    object actToggleBkpt: TAction
+      Category = 'Run'
+      Caption = 'Toggle breakpoint'
+      OnExecute = actToggleBkptExecute
+      ShortCut = 116
     end
   end
 end

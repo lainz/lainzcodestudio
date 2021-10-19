@@ -18,6 +18,7 @@ type
 
   TfrmMain = class(TForm)
     actFreeRun: TAction;
+    actToggleBkpt: TAction;
     actWatch: TAction;
     actStop: TAction;
     actPause: TAction;
@@ -51,7 +52,16 @@ type
     MenuItem26: TMenuItem;
     MenuItem27: TMenuItem;
     MenuItem28: TMenuItem;
+    MenuItem29: TMenuItem;
     MenuItem3: TMenuItem;
+    MenuItem30: TMenuItem;
+    MenuItem31: TMenuItem;
+    MenuItem32: TMenuItem;
+    MenuItem33: TMenuItem;
+    MenuItem34: TMenuItem;
+    MenuItem35: TMenuItem;
+    MenuItem36: TMenuItem;
+    MenuItem37: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItem5: TMenuItem;
     MenuItem6: TMenuItem;
@@ -77,10 +87,12 @@ type
     procedure actStepIntoExecute(Sender: TObject);
     procedure actStepOverExecute(Sender: TObject);
     procedure actStopExecute(Sender: TObject);
+    procedure actToggleBkptExecute(Sender: TObject);
     procedure actWatchExecute(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
     procedure EditorSpecialLineColors(Sender: TObject; Line: integer;
       var Special: boolean; var FG, BG: TColor);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure MenuItem12Click(Sender: TObject);
@@ -153,6 +165,8 @@ const
   FG_ACTIVE_ON_BKPT = clWhite;
   BG_ACTIVE_ON_BKPT = clMaroon;
 
+  // print() separator
+  PRINT_SEP = ' '; // or ''?
 
 var
   // Just for the scope
@@ -209,9 +223,7 @@ begin
     lua_yield(L, 0);
 end;
 
-function print(L: Plua_State): integer; cdecl;
-const
-  Sep = ' '; // or ''?
+function StackToStr(L: Plua_State; ASep: String): String;
 var
   I, N, T: Integer;
   S, Si: String;
@@ -235,11 +247,17 @@ begin
     end;
     if S = '' then
       S := Si else
-      S := S + Sep + Si;
+      S := S + ASep + Si;
   end;
-  frmMain.ListBox1.Items.AddText(S);
+  Result := S;
+end;
+
+function print(L: Plua_State): Integer; cdecl;
+begin
+  frmMain.ListBox1.Items.AddText(StackToStr(L, PRINT_SEP));
   Result := 0;
 end;
+
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
@@ -617,30 +635,37 @@ var
     Result := Result + '}';
   end;
 
+  function EvaLua(L: Plua_State; AExp: String): Integer;
+  begin
+    luaL_loadstring(L, PChar('return ' + AExp));
+    lua_pcall(L, 0, 1, 0);
+    Result := lua_type(L, -1);
+  end;
+
 begin
   Result := '';
   if not (ssRunning in Script.State) then
     Exit;
-  T := lua_getglobal(Script.Lt, PChar(AId));
+  T := EvaLua(Script.L, AId);
   try
     case T of
       LUA_TSTRING:
-        S := AddQuoted(lua_tostring(Script.Lt, -1));
+        S := AddQuoted(lua_tostring(Script.L, -1));
       LUA_TNUMBER:
-        S := lua_tostring(Script.Lt, -1);
+        S := lua_tostring(Script.L, -1);
       LUA_TNIL:
         S := 'nil';
       LUA_TBOOLEAN:
-        if lua_toboolean(Script.Lt, -1) then
+        if lua_toboolean(Script.L, -1) then
           S := 'true' else
           S := 'false';
       LUA_TTABLE:
-          S := TblToString(Script.Lt, 1);
+          S := TblToString(Script.L, 1);
       otherwise
-        S := '(' + lua_typename(Script.Lt, T) + ')';
+        S := '(' + lua_typename(Script.L, T) + ')';
     end;
   finally
-    lua_pop(Script.Lt, 1);
+    lua_pop(Script.L, 1);
   end;
   Result := S;
 end;
@@ -704,6 +729,11 @@ begin
     Script.ResetRq := True;
 end;
 
+procedure TfrmMain.actToggleBkptExecute(Sender: TObject);
+begin
+  ToggleBreakpoint(Editor.CaretY);
+end;
+
 procedure TfrmMain.actWatchExecute(Sender: TObject);
 var
   S, SID, Cont: String;
@@ -713,7 +743,6 @@ begin
   if S = '' then
   begin
     S := Trim(InputBox('Watch', 'Variable', ''));
-    //luaL_dostring(Script.Lt, PChar('print('+S+')'));
   end;
   if S = '' then
     Exit;
@@ -753,6 +782,12 @@ begin
   end
   else
     Special := False;
+end;
+
+procedure TfrmMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+begin
+  if ssRunning in Script.State then
+    ScriptFinalize(0);
 end;
 
 end.
