@@ -70,7 +70,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="3">
+    <Units Count="5">
       <Unit0>
         <Filename Value="lainzcs.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -86,6 +86,18 @@
         <Filename Value="uhighdpi.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit2>
+      <Unit3>
+        <Filename Value="ustack.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmStack"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="uwatches.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmWatches"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit4>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

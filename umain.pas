@@ -7,7 +7,7 @@ interface
 uses
   Classes, Forms, StdCtrls, Menus, Dialogs, Lua53, SynHighlighterLua, SynEdit,
   LCLIntF, Controls, SynGutterBase, SynEditMarks, SynEditMarkupSpecialLine,
-  Graphics, ActnList, Buttons;
+  Graphics, ActnList, Buttons, uwatches, ustack;
 
 type
   TScriptState = (ssRunning, ssPaused, ssStepInto, ssStepOver, ssFreeRun);
@@ -18,6 +18,9 @@ type
 
   TfrmMain = class(TForm)
     actFreeRun: TAction;
+    actRefreshWatches: TAction;
+    actShowStack: TAction;
+    actShowWatches: TAction;
     actToggleBkpt: TAction;
     actWatch: TAction;
     actStop: TAction;
@@ -26,7 +29,6 @@ type
     actStepOver: TAction;
     actRun: TAction;
     ActionList1: TActionList;
-    btnRun: TButton;
     ImageList2: TImageList;
     lblScriptState: TLabel;
     ListBox1: TListBox;
@@ -62,13 +64,17 @@ type
     MenuItem35: TMenuItem;
     MenuItem36: TMenuItem;
     MenuItem37: TMenuItem;
+    MenuItem38: TMenuItem;
+    MenuItem39: TMenuItem;
     MenuItem4: TMenuItem;
+    MenuItem40: TMenuItem;
+    MenuItem41: TMenuItem;
+    MenuItem42: TMenuItem;
     MenuItem5: TMenuItem;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
     MenuItem8: TMenuItem;
     MenuItem9: TMenuItem;
-    moWatches: TMemo;
     OpenDialog1: TOpenDialog;
     PopupMenu1: TPopupMenu;
     SaveDialog1: TSaveDialog;
@@ -82,14 +88,16 @@ type
     SynLuaSyn1: TSynLuaSyn;
     procedure actFreeRunExecute(Sender: TObject);
     procedure actPauseExecute(Sender: TObject);
+    procedure actRefreshWatchesExecute(Sender: TObject);
     procedure actRunExecute(Sender: TObject);
     procedure actRunUpdate(Sender: TObject);
+    procedure actShowStackExecute(Sender: TObject);
+    procedure actShowWatchesExecute(Sender: TObject);
     procedure actStepIntoExecute(Sender: TObject);
     procedure actStepOverExecute(Sender: TObject);
     procedure actStopExecute(Sender: TObject);
     procedure actToggleBkptExecute(Sender: TObject);
     procedure actWatchExecute(Sender: TObject);
-    procedure btnRunClick(Sender: TObject);
     procedure EditorSpecialLineColors(Sender: TObject; Line: integer;
       var Special: boolean; var FG, BG: TColor);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -136,7 +144,10 @@ type
     procedure DoStop(AReset: Boolean);
     procedure ShowError(AErrorMsg: String);
     function GetVarContents(AId: String): String;
-    procedure UpdateWatches;
+    function LuaVarToString(L: Plua_State): String;
+    function GetStackContents(L: Plua_State; AVarArgs, ATemps: Boolean): String;
+    procedure RefreshWatches;
+    procedure RefreshStack;
   public
     { public declarations }
   end;
@@ -165,8 +176,8 @@ const
   FG_ACTIVE_ON_BKPT = clWhite;
   BG_ACTIVE_ON_BKPT = clMaroon;
 
-  // print() separator
-  PRINT_SEP = ' '; // or ''?
+  PRINT_SEP = ' '; // (or ''?) print() separator
+  MAX_TABLE_N = 32; // Max table elements to show
 
 var
   // Just for the scope
@@ -257,7 +268,6 @@ begin
   frmMain.ListBox1.Items.AddText(StackToStr(L, PRINT_SEP));
   Result := 0;
 end;
-
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
@@ -465,7 +475,7 @@ begin
 
   actRun.Enabled := not Running or Paused;
   actFreeRun.Enabled := not Running or Paused;
-  actPause.Enabled := Running or not Paused;
+  actPause.Enabled := Running and not Paused;
   actStop.Enabled := Running;
 
   actStepInto.Enabled := not FreeRun;
@@ -565,7 +575,8 @@ begin
   else
     ScriptFinalize(stat);
   Editor.Refresh;
-  UpdateWatches;
+  RefreshWatches;
+  RefreshStack;
 end;
 
 procedure TfrmMain.DoStop(AReset: Boolean);
@@ -580,6 +591,27 @@ begin
 end;
 
 function TfrmMain.GetVarContents(AId: String): String;
+
+  function EvaLua(L: Plua_State; AExp: String): Integer;
+  begin
+    luaL_loadstring(L, PChar('return ' + AExp));
+    lua_pcall(L, 0, 1, 0);
+    Result := lua_type(L, -1);
+  end;
+
+begin
+  Result := '';
+  if not (ssRunning in Script.State) then
+    Exit;
+  EvaLua(Script.L, AId);
+  try
+    Result := LuaVarToString(Script.L);
+  finally
+    lua_pop(Script.L, 1);
+  end;
+end;
+
+function TfrmMain.LuaVarToString(L: Plua_State): String;
 var
   T: Integer;
   S: String;
@@ -610,12 +642,26 @@ var
     Result := Result + '"';
   end;
 
-  function TblToString(L: Plua_State; N: Integer): String;
+  function TblToString(L: Plua_State; V: Integer): String;
+  var
+    N: Integer;
   begin
     Result := '{';
+    N := 0;
     lua_pushnil(L);
     while lua_next(L, -2) <> 0 do
       try
+        if N < 1 then
+        else if N < MAX_TABLE_N then
+          Result := Result + ', '
+        else
+        begin // do not print after n-th element
+          Result := Result + ', ...';
+          lua_pop(L, 1);
+          Break;
+        end;
+        Inc(N);
+
         lua_pushvalue(L, -2);
         try
           Result := Result + lua_tostring(L, -1) + ' => ';
@@ -623,74 +669,103 @@ var
           lua_pop(L, 1);
         end;
         if lua_istable(L, -1) then
-          Result := Result + TblToString(L, N + 1)
+          Result := Result + TblToString(L, V + 1)
         else if lua_isstring(L, -1) then
           Result := Result + AddQuoted(lua_tostring(L, -1))
         else
           Result := Result + lua_tostring(L, -1);
 
-        Result := Result + ', ';
       finally
         lua_pop(L, 1);
       end;
     Result := Result + '}';
   end;
 
-  function EvaLua(L: Plua_State; AExp: String): Integer;
+begin
+  Result := '';
+  T := lua_type(L, -1);
+  case T of
+    LUA_TSTRING:
+      S := AddQuoted(lua_tostring(L, -1));
+    LUA_TNUMBER:
+      S := lua_tostring(L, -1);
+    LUA_TNIL:
+      S := 'nil';
+    LUA_TBOOLEAN:
+      if lua_toboolean(L, -1) then
+        S := 'true' else
+        S := 'false';
+    LUA_TTABLE:
+        S := TblToString(L, 1);
+    otherwise
+      S := '(' + lua_typename(L, T) + ')';
+  end;
+  Result := S;
+end;
+
+function TfrmMain.GetStackContents(L: Plua_State; AVarArgs, ATemps: Boolean
+  ): String;
+var
+  ar: lua_Debug;
+  I: Integer;
+  LName: String;
+  PLName: PChar;
+
+  procedure L1(AInc: Integer; Temps: Boolean);
   begin
-    luaL_loadstring(L, PChar('return ' + AExp));
-    lua_pcall(L, 0, 1, 0);
-    Result := lua_type(L, -1);
+    I := AInc;
+    while True do
+    begin
+      PLName := lua_getlocal(L, @ar, I);
+      if PLName = Nil then
+        Break
+      else
+        try
+          LName := StrPas(PLName);
+          if not Temps and (LName[1] = '(') then
+            Continue;
+          Result := Result +
+            LName + ' = ' + LuaVarToString(L) + LineEnding;
+        finally
+          I := I + AInc;
+          lua_pop(Script.Lt, 1);
+        end;
+    end;
   end;
 
 begin
   Result := '';
   if not (ssRunning in Script.State) then
     Exit;
-  T := EvaLua(Script.L, AId);
-  try
-    case T of
-      LUA_TSTRING:
-        S := AddQuoted(lua_tostring(Script.L, -1));
-      LUA_TNUMBER:
-        S := lua_tostring(Script.L, -1);
-      LUA_TNIL:
-        S := 'nil';
-      LUA_TBOOLEAN:
-        if lua_toboolean(Script.L, -1) then
-          S := 'true' else
-          S := 'false';
-      LUA_TTABLE:
-          S := TblToString(Script.L, 1);
-      otherwise
-        S := '(' + lua_typename(Script.L, T) + ')';
-    end;
-  finally
-    lua_pop(Script.L, 1);
-  end;
-  Result := S;
+  if lua_getstack(L, 0, @ar) <> 1 then
+    Exit;
+  if AVarArgs then
+    L1(-1, True);
+  L1(1, ATemps);
 end;
 
-procedure TfrmMain.UpdateWatches;
+procedure TfrmMain.RefreshWatches;
 var
   SID, Cont: String;
   I: Integer;
 begin
-  for I := 0 to Pred(moWatches.Lines.Count) do
-  begin
-    SID := Trim(ExtractWord(1, moWatches.Lines[I], ['=']{ID_DELIMITERS}));
-    if (SID = '') or not (SID[1] in ID_FIRST) then
-      Continue;
-    if (ssRunning in Script.State) then
-      Cont := GetVarContents(SID) else
-      Cont := '(not running)';
-    moWatches.Lines[I] := SID + ' = ' + Cont;
-  end;
+  with frmWatches do
+    for I := 0 to Pred(moWatches.Lines.Count) do
+    begin
+      SID := Trim(ExtractWord(1, moWatches.Lines[I], ['=']{ID_DELIMITERS}));
+      if (SID = '') or not (SID[1] in ID_FIRST) then
+        Continue;
+      if (ssRunning in Script.State) then
+        Cont := GetVarContents(SID) else
+        Cont := '(not running)';
+      moWatches.Lines[I] := SID + ' = ' + Cont;
+    end;
 end;
 
-procedure TfrmMain.btnRunClick(Sender: TObject);
+procedure TfrmMain.RefreshStack;
 begin
-  DoRun([]);
+  with frmStack do
+    moStack.Text := GetStackContents(Script.Lt, True, False);
 end;
 
 procedure TfrmMain.actRunExecute(Sender: TObject);
@@ -703,6 +778,20 @@ begin
 
 end;
 
+procedure TfrmMain.actShowStackExecute(Sender: TObject);
+begin
+  if frmStack.Visible then
+    frmStack.Hide else frmStack.Show;
+  actShowStack.Checked := frmStack.Visible;
+end;
+
+procedure TfrmMain.actShowWatchesExecute(Sender: TObject);
+begin
+  if frmWatches.Visible then
+    frmWatches.Hide else frmWatches.Show;
+  actShowWatches.Checked := frmWatches.Visible;
+end;
+
 procedure TfrmMain.actFreeRunExecute(Sender: TObject);
 begin
   DoRun([ssFreeRun]);
@@ -711,6 +800,11 @@ end;
 procedure TfrmMain.actPauseExecute(Sender: TObject);
 begin
   Script.StopRq := True;
+end;
+
+procedure TfrmMain.actRefreshWatchesExecute(Sender: TObject);
+begin
+  RefreshWatches;
 end;
 
 procedure TfrmMain.actStepIntoExecute(Sender: TObject);
@@ -755,7 +849,9 @@ begin
     if not (SID[1] in ID_FIRST) then
       Continue;
     Cont := GetVarContents(SID);
-    moWatches.Lines.Add(SID + ' = ' + Cont);
+    if not frmWatches.Visible then
+      actShowWatches.Execute;
+    frmWatches.moWatches.Lines.Add(SID + ' = ' + Cont);
   end;
 end;
 

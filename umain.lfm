@@ -518,28 +518,18 @@ object frmMain: TfrmMain
       end
     end
   end
-  object btnRun: TButton
-    Left = 8
-    Height = 25
-    Top = 8
-    Width = 115
-    Caption = 'Run'
-    OnClick = btnRunClick
-    ParentFont = False
-    TabOrder = 1
-  end
   object ListBox1: TListBox
     Left = 8
     Height = 152
     Top = 419
-    Width = 576
+    Width = 784
     Anchors = [akLeft, akRight, akBottom]
     ItemHeight = 0
     ParentFont = False
-    TabOrder = 2
+    TabOrder = 1
   end
   object SpeedButton1: TSpeedButton
-    Left = 144
+    Left = 8
     Height = 26
     Top = 7
     Width = 38
@@ -547,7 +537,7 @@ object frmMain: TfrmMain
     ParentFont = False
   end
   object SpeedButton2: TSpeedButton
-    Left = 184
+    Left = 48
     Height = 26
     Top = 7
     Width = 70
@@ -555,7 +545,7 @@ object frmMain: TfrmMain
     ParentFont = False
   end
   object SpeedButton3: TSpeedButton
-    Left = 256
+    Left = 120
     Height = 26
     Top = 7
     Width = 54
@@ -563,7 +553,7 @@ object frmMain: TfrmMain
     ParentFont = False
   end
   object SpeedButton4: TSpeedButton
-    Left = 312
+    Left = 176
     Height = 26
     Top = 7
     Width = 70
@@ -571,7 +561,7 @@ object frmMain: TfrmMain
     ParentFont = False
   end
   object SpeedButton5: TSpeedButton
-    Left = 384
+    Left = 248
     Height = 26
     Top = 7
     Width = 74
@@ -579,7 +569,7 @@ object frmMain: TfrmMain
     ParentFont = False
   end
   object SpeedButton6: TSpeedButton
-    Left = 460
+    Left = 324
     Height = 26
     Top = 7
     Width = 54
@@ -587,24 +577,13 @@ object frmMain: TfrmMain
     ParentFont = False
   end
   object lblScriptState: TLabel
-    Left = 520
+    Left = 384
     Height = 16
     Top = 13
     Width = 76
     Caption = 'lblScriptState'
     ParentColor = False
     ParentFont = False
-  end
-  object moWatches: TMemo
-    Left = 588
-    Height = 153
-    Top = 418
-    Width = 204
-    Anchors = [akRight, akBottom]
-    Color = clCream
-    ParentFont = False
-    TabOrder = 3
-    WordWrap = False
   end
   object SynLuaSyn1: TSynLuaSyn
     Enabled = False
@@ -688,6 +667,21 @@ object frmMain: TfrmMain
       object MenuItem16: TMenuItem
         Caption = 'Select All'
         OnClick = SynEditSelectAll
+      end
+    end
+    object MenuItem38: TMenuItem
+      Caption = 'View'
+      object MenuItem39: TMenuItem
+        Action = actShowStack
+      end
+      object MenuItem40: TMenuItem
+        Action = actShowWatches
+      end
+      object MenuItem41: TMenuItem
+        Caption = '-'
+      end
+      object MenuItem42: TMenuItem
+        Action = actRefreshWatches
       end
     end
     object MenuItem17: TMenuItem
@@ -1210,6 +1204,24 @@ object frmMain: TfrmMain
       Caption = 'Toggle breakpoint'
       OnExecute = actToggleBkptExecute
       ShortCut = 116
+    end
+    object actShowWatches: TAction
+      Category = 'View'
+      Caption = 'Watches'
+      OnExecute = actShowWatchesExecute
+      ShortCut = 49239
+    end
+    object actShowStack: TAction
+      Category = 'View'
+      Caption = 'Stack'
+      OnExecute = actShowStackExecute
+      ShortCut = 49235
+    end
+    object actRefreshWatches: TAction
+      Category = 'View'
+      Caption = 'Refresh Watches'
+      OnExecute = actRefreshWatchesExecute
+      ShortCut = 32884
     end
   end
 end
