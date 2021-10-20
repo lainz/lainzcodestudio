@@ -521,6 +521,7 @@ begin
   lua_sethook(Script.Lt, @DbgHook, LUA_MASKLINE + LUA_MASKCALL + LUA_MASKRET, 0);
   Result := (luaL_loadbuffer(Script.Lt, PChar(Script.S.Text),
     Length(Script.S.Text), 'Lainz Code Studio') = 0);
+  Script.CallDepth := 0;
   if not Result then
     ShowError(lua_tostring(Script.Lt, -1)); // invalid source line
 end;
@@ -677,7 +678,7 @@ var
 begin
   for I := 0 to Pred(moWatches.Lines.Count) do
   begin
-    SID := Trim(ExtractWord(1, moWatches.Lines[I], ID_DELIMITERS));
+    SID := Trim(ExtractWord(1, moWatches.Lines[I], ['=']{ID_DELIMITERS}));
     if (SID = '') or not (SID[1] in ID_FIRST) then
       Continue;
     if (ssRunning in Script.State) then
