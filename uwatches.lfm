@@ -1,0 +1,25 @@
+object frmWatches: TfrmWatches
+  Left = 457
+  Height = 240
+  Top = 173
+  Width = 320
+  BorderStyle = bsToolWindow
+  Caption = 'Watch'
+  ClientHeight = 240
+  ClientWidth = 320
+  FormStyle = fsStayOnTop
+  Position = poDefault
+  LCLVersion = '1.9.0.0'
+  object moWatches: TMemo
+    Left = 0
+    Height = 240
+    Top = 0
+    Width = 320
+    Align = alClient
+    Color = clMoneyGreen
+    ParentFont = False
+    ScrollBars = ssAutoBoth
+    TabOrder = 0
+    WordWrap = False
+  end
+end
